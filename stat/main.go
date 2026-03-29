@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode"
 
 	_ "modernc.org/sqlite"
 )
@@ -110,7 +111,7 @@ func containsNone(text string, words []string) bool {
 }
 
 func extractTopKeywords(posts []Post, include, exclude []string, topN int) []KeywordCount {
-	re := regexp.MustCompile(`[a-zA-Z']+`)
+	re := regexp.MustCompile(`[a-zA-Z']+|[\p{Han}]+`)
 	freq := map[string]int{}
 	excludedMap := map[string]bool{}
 
@@ -122,9 +123,9 @@ func extractTopKeywords(posts []Post, include, exclude []string, topN int) []Key
 	}
 
 	for _, post := range posts {
-		tokens := re.FindAllString(strings.ToLower(post.Content), -1)
+		tokens := extractKeywordTokens(post.Content, re)
 		for _, t := range tokens {
-			if len(t) <= 2 || stopWords[t] || excludedMap[t] {
+			if isTooShortKeyword(t) || stopWords[t] || excludedMap[t] {
 				continue
 			}
 			freq[t]++
@@ -147,6 +148,56 @@ func extractTopKeywords(posts []Post, include, exclude []string, topN int) []Key
 		items = items[:topN]
 	}
 	return items
+}
+
+func extractKeywordTokens(content string, re *regexp.Regexp) []string {
+	matches := re.FindAllString(strings.ToLower(content), -1)
+	tokens := make([]string, 0, len(matches)*2)
+
+	for _, m := range matches {
+		if isHanOnly(m) {
+			tokens = append(tokens, hanBigrams(m)...)
+			continue
+		}
+		tokens = append(tokens, m)
+	}
+
+	return tokens
+}
+
+func isHanOnly(text string) bool {
+	if text == "" {
+		return false
+	}
+	for _, r := range text {
+		if !unicode.Is(unicode.Han, r) {
+			return false
+		}
+	}
+	return true
+}
+
+func hanBigrams(text string) []string {
+	runes := []rune(text)
+	if len(runes) < 2 {
+		return nil
+	}
+	if len(runes) == 2 {
+		return []string{text}
+	}
+
+	bigrams := make([]string, 0, len(runes)-1)
+	for i := 0; i < len(runes)-1; i++ {
+		bigrams = append(bigrams, string(runes[i:i+2]))
+	}
+	return bigrams
+}
+
+func isTooShortKeyword(token string) bool {
+	if isHanOnly(token) {
+		return len([]rune(token)) < 2
+	}
+	return len(token) <= 2
 }
 
 func buildTrends(posts []Post) []TrendPoint {

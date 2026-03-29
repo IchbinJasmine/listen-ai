@@ -41,15 +41,15 @@ with st.sidebar:
 
 col1, col2 = st.columns(2)
 with col1:
-    include_input = st.text_input("Include keywords (comma-separated)", "listen ai, dashboard")
+    include_input = st.text_input("Include keywords (comma-separated)", "")
 with col2:
-    exclude_input = st.text_input("Exclude keywords (comma-separated)", "spam")
+    exclude_input = st.text_input("Exclude keywords (comma-separated)", "")
 
 range_col1, range_col2, range_col3 = st.columns([2, 2, 1])
 with range_col1:
-    from_date = st.date_input("From date", value=date.today() - timedelta(days=30))
+    from_date = st.date_input("From date", value=date.today() - timedelta(days=365))
 with range_col2:
-    to_date = st.date_input("To date", value=date.today())
+    to_date = st.date_input("To date", value=date.today() + timedelta(days=365))
 with range_col3:
     sample_size = st.number_input("Example posts", min_value=1, max_value=20, value=5)
 
