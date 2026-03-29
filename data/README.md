@@ -25,9 +25,7 @@ YYYY-MM-DD
 1. Download the `posts.csv` file from [Google Drive](https://drive.google.com/file/d/1GCzFt9xFxAlr_FCCJprBqClJE4Qbpu4q/view?usp=sharing)
 2. Import the posts into the database with:
 ```bash
-python import_posts.py \
-  --csv ./posts.csv \
-  --db ./data/listenai.db
+python import_posts.py --csv ./data/posts.csv --db ./data/listenai.db
 ```
 
 ## Behavior
