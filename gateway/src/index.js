@@ -8,8 +8,8 @@ dotenv.config();
 
 const app = express();
 const port = process.env.GATEWAY_PORT || 8000;
-const statUrl = process.env.STAT_URL || "http://localhost:8002";
-const nlpUrl = process.env.NLP_URL || "http://localhost:8001";
+const statUrl = process.env.STAT_URL || "http://stat:8002";
+const nlpUrl = process.env.NLP_URL || "http://nlp8001";
 const jwtSecret = process.env.JWT_SECRET || "supersecret";
 const demoUser = process.env.DEMO_USER || "admin";
 const demoPass = process.env.DEMO_PASS || "admin123";
@@ -92,6 +92,10 @@ app.post("/api/dashboard", authMiddleware, async (req, res) => {
       totalAnalyzedPosts: classifiedPosts.length,
     });
   } catch (err) {
+    // 💡 加這行：把最原始、最完整的錯誤印在終端機，方便我們抓蟲
+    console.error("🚨 Dashboard 發生嚴重錯誤：", err.message);
+    if (err.response) console.error("詳細回傳資料：", err.response.data);
+
     const detail = err.response?.data || err.message;
     return res.status(500).json({
       error: "Failed to build dashboard response",

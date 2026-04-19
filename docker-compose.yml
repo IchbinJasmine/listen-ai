@@ -1,13 +1,13 @@
 version: '3.8'
 services:
   frontend:
-    build: ./frontend
+    build: ./frontend # Dockerfile 所在的資料夾
     ports:
-      - "8501:8501"
+      - "8501:8501" # 本機 Port : 容器內 Port
     environment:
       - GATEWAY_URL=http://gateway:8000
     depends_on:
-      - gateway
+      - gateway # 確保啟動順序
 
   gateway:
     build: ./gateway

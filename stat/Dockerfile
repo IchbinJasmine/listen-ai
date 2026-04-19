@@ -1,5 +1,5 @@
 # 使用 golang alpine 作為編譯環境
-FROM golang:1.21-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 # 安裝編譯 SQLite 必要的工具 (這行是解決 exit code 1 的關鍵)
 RUN apk add --no-cache gcc musl-dev sqlite-dev
